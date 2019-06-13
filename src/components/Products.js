@@ -36,23 +36,23 @@ export default class  Products extends Component {
        )
     }
     loadCommentsFromServer() {
-        this.$.ajax({
-          url: '/products?page=1&limit=6',
-          data: { limit: this.props.perPage, offset: this.state.offset },
-          dataType: 'json',
-          type: 'GET',
+        // this.$.ajax({
+        //   url: '/products?page=1&limit=6',
+        //   data: { limit: this.props.perPage, offset: this.state.offset },
+        //   dataType: 'json',
+        //   type: 'GET',
     
-          success: data => {
-            this.setState({
-              data: data.comments,
-              pageCount: Math.ceil(data.meta.total_count / data.meta.limit),
-            });
-          },
+        //   success: data => {
+        //     this.setState({
+        //       data: data.comments,
+        //       pageCount: Math.ceil(data.meta.total_count / data.meta.limit),
+        //     });
+        //   },
     
-          error: (xhr, status, err) => {
-            console.error(this.props.url, status, err.toString()); // eslint-disable-line
-          },
-        });
+        //   error: (xhr, status, err) => {
+        //     console.error(this.props.url, status, err.toString()); // eslint-disable-line
+        //   },
+        // });
       }
     
    
