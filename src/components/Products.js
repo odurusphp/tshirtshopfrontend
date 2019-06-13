@@ -14,11 +14,12 @@ export default class  Products extends Component {
     state = {
         products: [],
         departments: [],
-        pageCount: 20
+        pageCount: 20,
+        currentPage : 1,
     };
 
     listproducts=()=>{
-        axios.get('http://www.tshirtshop.local/products?page=1&limit=6').then(res=>{  
+        axios.get('/products?page=1&limit=6').then(res=>{  
             this.setState(
                 { products : res.data.row}
             )
@@ -27,7 +28,7 @@ export default class  Products extends Component {
     }
 
     listdepartments=()=>{
-        axios.get('http://www.tshirtshop.local/departments').then(res=>{  
+        axios.get('/departments').then(res=>{  
             this.setState(
                 { departments : res.data}
             )
@@ -36,7 +37,7 @@ export default class  Products extends Component {
     }
     loadCommentsFromServer() {
         this.$.ajax({
-          url: this.props.url,
+          url: '/products?page=1&limit=6',
           data: { limit: this.props.perPage, offset: this.state.offset },
           dataType: 'json',
           type: 'GET',
@@ -54,17 +55,17 @@ export default class  Products extends Component {
         });
       }
     
-      componentDidMount() {
-        this.loadCommentsFromServer();
-      }
+   
     
       handlePageClick = data => {
         let selected = data.selected;
         let offset = Math.ceil(selected * this.props.perPage);
     
-        this.setState({ offset: offset }, () => {
-          this.loadCommentsFromServer();
-        });
+        // this.setState({ offset: offset }, () => {
+        //   this.loadCommentsFromServer();
+        // });
+
+        console.log(offset)
       };
     
 
@@ -73,6 +74,7 @@ export default class  Products extends Component {
     componentDidMount(){
        this.listproducts();
        this.listdepartments();
+       this.loadCommentsFromServer();
     }
 
 
