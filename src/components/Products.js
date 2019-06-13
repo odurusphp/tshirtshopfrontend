@@ -7,14 +7,15 @@ import ReactPaginate from 'react-paginate';
 
 
 export default class  Products extends Component {
-
-   state = {
-        products : [] ,
+    constructor(){ 
+        super();
+        this.$ = window.$;
+    }
+    state = {
+        products: [],
         departments: [],
-        pageCount : 20
+        pageCount: 20
     };
-    $ = window.$;
-    console.log($);
 
     listproducts=()=>{
         axios.get('http://www.tshirtshop.local/products?page=1&limit=6').then(res=>{  
@@ -34,7 +35,7 @@ export default class  Products extends Component {
        )
     }
     loadCommentsFromServer() {
-        $.ajax({
+        this.$.ajax({
           url: this.props.url,
           data: { limit: this.props.perPage, offset: this.state.offset },
           dataType: 'json',
