@@ -7,15 +7,14 @@ import ReactPaginate from 'react-paginate';
 
 
 export default class  Products extends Component {
-    constructor(){ 
-        super();
-        this.$ = window.$;
-    }
+    $ = window.$;
     state = {
         products: [],
         departments: [],
         pageCount: 20,
-        currentPage : 1,
+        currentPage: 1,
+        offset: 0,
+        perPage: 6
     };
 
     listproducts=()=>{
@@ -37,35 +36,34 @@ export default class  Products extends Component {
     }
     loadCommentsFromServer() {
         this.$.ajax({
-          url: '/products?page=1&limit=6',
-          data: { limit: this.props.perPage, offset: this.state.offset },
-          dataType: 'json',
-          type: 'GET',
-    
-          success: data => {
-            this.setState({
-              data: data.comments,
-              pageCount: Math.ceil(data.meta.total_count / data.meta.limit),
-            });
-          },
-    
-          error: (xhr, status, err) => {
-            console.error(this.props.url, status, err.toString()); // eslint-disable-line
-          },
+            url: `/products?page=${this.state.currentPage}&limit=${this.perPage}`,
+            data: { limit: this.state.perPage, offset: this.state.offset },
+            dataType: 'json',
+            type: 'GET',
+
+            //This section requires input from you. We will need to discuss
+            success: data => {
+                this.setState({
+                    data: data.comments,
+                    pageCount: Math.ceil(data.meta.total_count / data.meta.limit),
+                });
+            },
+
+            error: (xhr, status, err) => {
+                console.error(this.props.url, status, err.toString()); // eslint-disable-line
+            },
         });
-      }
+    }
     
    
     
       handlePageClick = data => {
-        let selected = data.selected;
-        let offset = Math.ceil(selected * this.props.perPage);
-    
-        // this.setState({ offset: offset }, () => {
-        //   this.loadCommentsFromServer();
-        // });
-
-        console.log(offset)
+            let selected = data.selected;
+            let offset = Math.ceil(selected * this.state.perPage);
+            console.log(offset);
+            this.setState({ offset: offset }, () => {
+                this.loadCommentsFromServer();
+            });
       };
     
 
