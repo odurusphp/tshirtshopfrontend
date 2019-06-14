@@ -156,7 +156,7 @@ export default class  Products extends Component {
                              
                                 </div>
                 
-                       <Departments departmentdata={this.state.departments} />
+                              <Departments departmentdata={this.state.departments} />
 
                 </div>
 
@@ -182,6 +182,7 @@ export default class  Products extends Component {
  )
         }
     }
+
 
 
 

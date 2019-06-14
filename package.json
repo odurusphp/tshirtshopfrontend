@@ -1,5 +1,5 @@
 {
-  "proxy": "http://www.tshirtshop.local:80",
+  "proxy": "http://tshirtshop.pnyo.org:80",
   "name": "tshirt",
   "version": "0.1.0",
   "private": true,
