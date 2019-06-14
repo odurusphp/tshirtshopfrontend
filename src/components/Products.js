@@ -6,7 +6,6 @@ import ReactPaginate from "react-paginate";
 export default class Products extends Component {
   constructor() {
     super();
-    this.$ = window.$;
   }
 
   state = {
@@ -20,7 +19,6 @@ export default class Products extends Component {
   };
 
   listproducts = () => {
-    //console.log(this.state.currentPage);
     axios.get(`/products?page=${this.state.currentPage}&limit=${this.state.perPage}`).then(res => {
       this.setState({ pageCount:res.data.count / this.state.perPage, products: res.data.row });
     });
@@ -40,7 +38,6 @@ export default class Products extends Component {
   };
 
   handlePageClick = data => {
-    console.log(data.selected);
     this.setState({ currentPage: data.selected + 1 }, () => {
       this.listproducts();
     });
