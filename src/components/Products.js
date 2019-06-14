@@ -8,6 +8,7 @@ export default class Products extends Component {
     super();
     this.$ = window.$;
   }
+
   state = {
     products: [],
     departments: [],
@@ -142,7 +143,7 @@ export default class Products extends Component {
 
             <Departments departmentdata={this.state.departments} />
           </div>
-
+          {this.props.search}
           <ReactPaginate
             previousLabel={"prev."}
             nextLabel={"next"}
