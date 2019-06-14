@@ -4,12 +4,21 @@ import axios from "axios";
 import ReactPaginate from "react-paginate";
 
 export default class Products extends Component {
+    constructor() {
+        super();
+        this.handlePageClick = this.handlePageClick.bind(this);
+    }
   state = {
     products: [],
     departments: [],
     currentPage: 1,
     perPage: 6
   };
+  
+  async getCartUniqueId() {
+    return await axios.get('/shoppingcart/generateUniqueId');
+  }
+
 
   listproducts = () => {
     axios.get(`/products?page=${this.state.currentPage}&limit=${this.state.perPage}`).then(res => {
@@ -24,10 +33,14 @@ export default class Products extends Component {
     });
   };
 
-  handlePageClick = data => {
+  handlePageClick(data) {
     let selected = data.selected;
     this.setState({ currentPage: selected + 1 }, () => {
       this.listproducts();
+    });
+    let jd = this.getCartUniqueId();
+    jd.then(response => {
+      console.log("Prince", response.data);
     });
   };
 
@@ -37,6 +50,7 @@ export default class Products extends Component {
   }
 
   render() {
+    
     return (
       <div>
         <br />
