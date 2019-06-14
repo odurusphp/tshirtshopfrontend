@@ -2,9 +2,10 @@ import React from 'react';
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import Mainpage from '../pages/Mainpage'
+import Register from '../pages/Register'
 import Login from '../pages/Login'
 import Productdetails from '../pages/Productdetails'
-import {BrowserRouter, Route, Switch, Link, NavLink} from 'react-router-dom'
+import {BrowserRouter as Router, Route, Switch, Link} from 'react-router-dom'
 
 
 const pageNotFound = ()=>(
@@ -15,19 +16,20 @@ const pageNotFound = ()=>(
 
 
 const AppRouter = ()=> (
-    <BrowserRouter>
+    <Router>
     <div>
     <Header/>
     <Switch>
       <Route path='/' component={Mainpage} exact={true} />
       <Route path='/login' component={Login} />
+      <Route path='/register' component={Register} />
       <Route path='/productdetails/:product_id' component={Productdetails} />
       <Route  component={pageNotFound} />
 
     </Switch>
     <Footer/>
     </div>
-    </BrowserRouter>
+    </Router>
   )
 
   export default AppRouter

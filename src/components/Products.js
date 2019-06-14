@@ -4,26 +4,24 @@ import axios from "axios";
 import ReactPaginate from "react-paginate";
 
 export default class Products extends Component {
-    constructor() {
-        super();
-        this.handlePageClick = this.handlePageClick.bind(this);
-    }
+  constructor() {
+    super();
+    this.$ = window.$;
+  }
   state = {
     products: [],
     departments: [],
+    pageCount: 0,
     currentPage: 1,
+    cart_id: window.localStorage.getItem("cart_id"),
+    cart_items: [],
     perPage: 6
   };
-  
-  async getCartUniqueId() {
-    return await axios.get('/shoppingcart/generateUniqueId');
-  }
-
 
   listproducts = () => {
+    //console.log(this.state.currentPage);
     axios.get(`/products?page=${this.state.currentPage}&limit=${this.state.perPage}`).then(res => {
-      this.setState({ products: res.data.row });
-      this.setState({ pageCount: res.data.count / this.state.perPage })
+      this.setState({ pageCount:res.data.count / this.state.perPage, products: res.data.row });
     });
   };
 
@@ -33,24 +31,27 @@ export default class Products extends Component {
     });
   };
 
-  handlePageClick(data) {
-    let selected = data.selected;
-    this.setState({ currentPage: selected + 1 }, () => {
-      this.listproducts();
+  listcartitems = () => {
+    axios.get("/shoppingcart/" + this.state.cart_id).then(res => {
+      console.log(res.data);
+      this.setState({ cart_items: res.data });
     });
-    let jd = this.getCartUniqueId();
-    jd.then(response => {
-      console.log("Prince", response.data);
+  };
+
+  handlePageClick = data => {
+    console.log(data.selected);
+    this.setState({ currentPage: data.selected + 1 }, () => {
+      this.listproducts();
     });
   };
 
   componentDidMount() {
     this.listproducts();
     this.listdepartments();
+    this.listcartitems();
   }
 
   render() {
-    
     return (
       <div>
         <br />
@@ -68,7 +69,7 @@ export default class Products extends Component {
                   <div
                     role="tabpanel"
                     className="tab-pane active"
-                    id="grid-extended"
+                    id="grid"
                     aria-expanded="true"
                   >
                     <ul className="products columns-3">
@@ -76,11 +77,6 @@ export default class Products extends Component {
                         <li className="product" key={products.product_id}>
                           <div className="product-outer">
                             <div className="product-inner">
-                              <span className="loop-product-categories">
-                                <a href="product-category.html" rel="tag">
-                                  Smartphones
-                                </a>
-                              </span>
                               <a
                                 href={"/productdetails/" + products.product_id}
                               >
@@ -93,6 +89,7 @@ export default class Products extends Component {
                                     src={"product_images/" + products.thumbnail}
                                     alt=""
                                   />
+                                  <div>{products.description}</div>
                                 </div>
                               </a>
 
@@ -111,33 +108,6 @@ export default class Products extends Component {
                                     </del>
                                   </span>
                                 </span>
-                                <a
-                                  rel="nofollow"
-                                  href={
-                                    "/productdetails/" + products.product_id
-                                  }
-                                  className="button add_to_cart_button"
-                                >
-                                  Add to cart
-                                </a>
-                              </div>
-
-                              <div className="hover-area">
-                                <div className="action-buttons">
-                                  <a
-                                    href="#wishlist"
-                                    rel="nofollow"
-                                    className="add_to_wishlist"
-                                  >
-                                    Wishlist
-                                  </a>
-                                  <a
-                                    href="#compare"
-                                    className="add-to-compare-link"
-                                  >
-                                    Compare
-                                  </a>
-                                </div>
                               </div>
                             </div>
                           </div>
@@ -178,7 +148,7 @@ export default class Products extends Component {
             nextLabel={"next"}
             breakLabel={"..."}
             breakClassName={"break-me"}
-            pageCount={this.state.perPage}
+            pageCount={this.state.pageCount}
             marginPagesDisplayed={2}
             pageRangeDisplayed={5}
             onPageChange={this.handlePageClick}

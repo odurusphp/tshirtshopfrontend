@@ -12,8 +12,9 @@ import React , { Component } from 'react'
 
      return(
          <div>
-
+               { this.props.categorydata.length > 0 && (
                <ul className="product-categories category-single">
+                  
                     <li className="product_cat">
                         <ul className="show-all-cat">
                             <li className="product_cat"><span className="show-all-cat-dropdown">Categories</span></li>
@@ -30,6 +31,7 @@ import React , { Component } from 'react'
                                     </ul>
                                 </li>
                             </ul>
+               )}
                     </div>
 )
   }
