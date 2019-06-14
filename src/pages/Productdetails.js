@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios'
 import '../scripts/assets/css/pagination.css'
+import { Redirect } from 'react-router-dom'
 
 
 
@@ -16,17 +17,20 @@ class Productdetails extends Component {
         image_2: '',
         thumbnail : '',
         display : '',
-        user_key: window.localStorage.getItem('user_key')
+        user_key: window.localStorage.getItem('user_key'),
+        attributes : [], 
+        color : '',
+        size: '',
+        cart_id: window.localStorage.getItem('cart_id'),
+        redirect: false,
+
     }
-
-
-
 
     getProductDetails = ()=>{
 
         const product_id  = this.props.match.params.product_id  
    
-        axios.get('http://www.tshirtshop.local/products/'+product_id).then(res=>{  
+        axios.get('/products/'+product_id).then(res=>{  
             this.setState(
                 {
                      name : res.data.name,
@@ -43,18 +47,80 @@ class Productdetails extends Component {
        )
     }
 
-    componentDidMount(){
-        this.getProductDetails();
+    handlechange(e) {
+        this.setState({[e.target.name]: e.target.value});
+        alert(e.target.value)
+      }
 
-        console.log(this.state.user_key);
+
+   
+
+    async productAttributes() {
+        const product_id  = this.props.match.params.product_id 
+      
+        axios.get('/attributes/inProduct/'+product_id).then(res=>{
+            this.setState({ attributes : res.data })
+        })
+      
+     } 
+
+     async getCartUniqueId() {
+        return await axios.get('/shoppingcart/generateUniqueId');
+      }
+      
+    
+      saveCart=(e)=> {
+        e.preventDefault();
+        let jd = this.getCartUniqueId();
+        jd.then(response => {
+           this.prepareCart(response.data.cart_id)
+        });
+     }
+
+
+      prepareCart(cart_id){
+       
+        var bodyFormData = new FormData();
+        const storedcartid = this.state.cart_id === '' ? cart_id : this.state.cart_id ;
+        
+        bodyFormData.append('cart_id', storedcartid);
+        bodyFormData.append('product_id', this.props.match.params.product_id);
+        bodyFormData.append('attributes', this.state.size + ', ' +  this.state.color);
+        
+        axios.post('/shoppingcart/add', bodyFormData)
+        .then(res=>{
+             if(res.data.error){          
+               alert('Error adding cart');
+             }else{
+                window.localStorage.setItem('cart_id', storedcartid) 
+                this.setState({ redirect : true })
+                alert('Product sucessfully added to cart');
+             }
+
+           
+        })
+    }
+
+    componentDidMount(){
+        this.getProductDetails(); 
+        this.productAttributes();
         
     }
 
     render(){
-   
+
+        const  { redirect } = this.state;
+        
+        if (redirect) {
+           return <Redirect to='/' />;
+         }
+
+     
     return (
 
+    
     <div className=" single-product full-width extended">
+    
 
     <div id="content" className="site-content" tabIndex="-1">
     <div className="container">
@@ -80,16 +146,6 @@ class Productdetails extends Component {
                         <div className="summary entry-summary">
                          
                             <h1 itemProp="name" className="product_title entry-title">{this.state.name}</h1>
-
-                            <div className="woocommerce-product-rating" itemProp="aggregateRating" itemScope itemType="http://schema.org/AggregateRating">
-                                <div className="star-rating" title="Rated 4.33 out of 5">
-                                    <span><strong itemProp="ratingValue" className="rating">4.33</strong> out of<span itemProp="bestRating">5</span>based on<span itemProp="ratingCount" className="rating">3</span> customer ratings</span>
-                                </div>
-                                <a href="#reviews" className="woocommerce-review-link" rel="nofollow">(<span itemProp="reviewCount" className="count">3</span> customer reviews)</a>
-                            </div>
-
-        
-
                             <div itemProp="description">
                             
                                 <p>{this.state.description}</p>
@@ -110,44 +166,47 @@ class Productdetails extends Component {
 
                                 </div>
 
-                                <form className="variations_form cart" method="post">
+                                <form className="variations_form cart" onSubmit={ (e)=>{ this.saveCart(e)}  }>
 
                                     <table className="variations">
                                         <tbody>
                                             <tr>
-                                                <td className="label"><label htmlFor="pa_color">Color</label></td>
+                                                <td className="value">Color</td>
                                                 <td className="value">
-                                                    <select id="pa_color" className="" name="attribute_pa_color"
-                                                     data-attribute_name="attribute_pa_color">
-                                                     <option> Choose an option</option>
-                                                     <option>Black with Red</option>
-                                                     <option>White with Gold</option>
+                                                    <select id="pa_color" name="color"
+                                                     data-attribute_name="attribute_pa_color" value={this.state.color} 
+                                                     onChange={(e)=>{ this.handlechange(e) } } >
+                                                     { this.state.attributes.map(att=> (
+                                                         <option>{ att.attribute_name === 'Color' && att.attribute_value  } </option>))  }
                                                      </select>
-                                                      <a className="reset_variations" href="#clear">Clear</a>
+                                                      
                                                 </td>
                                             </tr>
+
+                                            <tr>
+                                            <td className="value">Size</td>
+                                            <td className="value">
+                                                <select id="pa_color" name="size"
+                                                 data-attribute_name="attribute_pa_color" value={this.state.size} 
+                                                 onChange={(e)=>{ this.handlechange(e) } } >
+                                                 { this.state.attributes.map(att=> (
+                                                     <option>{ att.attribute_name === 'Size' && att.attribute_value  } </option>))  }
+                                                 </select>
+                                                  
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
 
                                     <div className="single_variation_wrap">
                                         <div className="woocommerce-variation single_variation"></div>
                                         <div className="woocommerce-variation-add-to-cart variations_button">
-                                            <div className="quantity">
-                                                <label>Quantity:</label>
-                                                <input type="number" name="quantity" value="1" title="Qty" className="input-text qty text"/>
-                                            </div>
+                            
                                             <button type="submit" className="single_add_to_cart_button button alt">Add to cart</button>
-                                            <input type="hidden" name="add-to-cart" value="2439" />
-                                            <input type="hidden" name="product_id" value="2439" />
-                                            <input type="hidden" name="variation_id" className="variation_id" value="0" />
+                                           
                                         </div>
                                     </div>
                                 </form>
-
-                                <div className="action-buttons">
-                                    <a href="http://transvelo.github.io/electro/product/ultra-wireless-s50-headphones-s50-with-bluetooth/?add_to_wishlist=2439" rel="nofollow" className="add_to_wishlist" > Wishlist</a>
-                                    <a href="http://transvelo.github.io/electro/product/ultra-wireless-s50-headphones-s50-with-bluetooth/?action=yith-woocompare-add-product&amp;id=2439" className="add-to-compare-link" data-product_id="2439">Compare</a>
-                                </div>
                             </div>
                         </div>
 

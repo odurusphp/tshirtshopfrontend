@@ -1,5 +1,7 @@
 import React,  {Component} from 'react';
 import axios from 'axios'
+import {Redirect} from 'react-router-dom'
+
 
 
 class Login extends Component{
@@ -10,29 +12,44 @@ class Login extends Component{
         name  : '',
         password: '',
         email : '',
-
+        redirect : false,
+        errorMessage: '',
+        errorCode:''
     }
 
-    // handlechange(e) {
-    //     this.setState({name: e.target.value});
-    // }
+
 
     handlechange(e) {
         this.setState({[e.target.name]: e.target.value});
       }
 
-     handleSubmit(e){
+
+
+    handleLogin(e){
       
         e.preventDefault();
+        window.localStorage.setItem('user_key', '');
       
         var bodyFormData = new FormData();
-        bodyFormData.append('name', this.state.name);
-        bodyFormData.append('email', this.state.email);
-        bodyFormData.append('password', this.state.password);
+        bodyFormData.append('email', this.state.username);
+        bodyFormData.append('password', this.state.userpassword);
 
-        axios.post('/customers', bodyFormData)
+        axios.post('/customers/login', bodyFormData)
         .then(res=>{
-            window.localStorage.setItem('user_key', res.data.accessToken);
+        
+             if(res.data.error){
+                window.localStorage.setItem('user_key', '');
+                this.setState({
+                    errorMessage: res.data.error.message,
+                    errorCode: res.data.error.code,
+                    redirect : false
+                })
+             }else{
+                window.localStorage.setItem('user_key', res.data.accessToken);
+                this.setState({ redirect : true })
+             }
+
+           
         })
     }
 
@@ -42,6 +59,12 @@ class Login extends Component{
     }
 
     render(){
+
+        const  { redirect } = this.state;
+        
+         if (redirect) {
+            return <Redirect to='/' />;
+          }
 
         return(
     
@@ -57,26 +80,28 @@ class Login extends Component{
                     <div className="entry-content">
                         <div className="woocommerce">
                             <div className="customer-login-form">
-                                <span className="or-text">or</span>
+                                
 
-                                <div className="col2-set" id="customer_login">
+                                <div className="col2-set">
 
                                     <div className="col-1">
 
                                         <h2>Login</h2>
 
-                                        <form  className="login"  >
+                                        <form  className="login" onSubmit={ (e)=>{ this.handleLogin(e)}  } >
 
-                                            <p className="before-login-text">Welcome back! Sign in to your account</p>
+                                            <p className="error-text">{ this.state.errorMessage }</p>
 
                                             <p className="form-row form-row-wide">
                                                 <label htmlFor="username">Username or email address<span className="required">*</span></label>
-                                                <input type="text" className="input-text" name="username" id="username"  />
+                                                <input type="text" className="input-text" name="username" id="username" 
+                                                 value = {this.state.username}  onChange={(e)=>{ this.handlechange(e) } }  />
                                             </p>
 
                                             <p className="form-row form-row-wide">
                                                 <label htmlFor="userpassword">Password<span className="required">*</span></label>
-                                                <input className="input-text" type="password" name="userpassword" id="userpassword" />
+                                                <input className="input-text" type="password" name="userpassword" id="userpassword" 
+                                                value = {this.state.userpassword}  onChange={(e)=>{ this.handlechange(e) } } />
                                             </p>
 
                                             <p className="form-row">
@@ -89,42 +114,7 @@ class Login extends Component{
 
                                     </div>
 
-                                    <div className="col-2">
-
-                                        <h2>Register</h2>
-
-                                        <form  className="register" onSubmit={ (e)=>{ this.handleSubmit(e)}  } >
-
-                                            <p className="before-register-text">Create your very own account</p>
-
-                                            <p className="form-row form-row-wide">
-                                                <label htmlFor="name">Name<span className="required">*</span></label>
-                                                <input type="text" className="input-text" name="name" id="name" 
-                                                 value={this.state.name} 
-                                                 onChange={(e)=>{ this.handlechange(e) } }  />
-                                            </p>
-
-                                            <p className="form-row form-row-wide">
-                                                <label htmlFor="email">Email address<span className="required">*</span></label>
-                                                <input type="email" className="input-text" name="email" id="email" 
-                                                 value={this.state.email} 
-                                                 onChange={(e)=>{ this.handlechange(e) } }
-                                                />
-                                            </p>
-
-                                            <p className="form-row form-row-wide">
-                                                <label htmlFor="password">Password<span className="required">*</span></label>
-                                                <input type="password" className="input-text" name="password" id="password"
-                                                  value={this.state.password} 
-                                                  onChange={(e)=>{ this.handlechange(e) } } />
-                                            </p>
-
-                                            <p className="form-row"><input type="submit" className="button" name="register" value="Register" /></p>
-
-
-                                        </form>
-
-                                    </div>
+                                 
 
                                 </div>
 

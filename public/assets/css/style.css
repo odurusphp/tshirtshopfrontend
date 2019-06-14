@@ -10184,3 +10184,8 @@ h3.faq-title {
   .section-onsale-product-carousel .onsale-product-carousel .onsale-product .onsale-product-content .button,
   .products-carousel .owl-item .product .button {
     position: relative; } }
+
+    .error-text{
+      color:red;
+      font-weight: 700
+    }
