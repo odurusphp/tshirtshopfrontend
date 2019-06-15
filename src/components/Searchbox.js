@@ -6,7 +6,8 @@ import axios from  'axios';
 
     state = {
         cart_id : window.localStorage.getItem('cart_id'),
-        cart_items : []
+        cart_items : [],
+        total_amount : ''
     }
 
     listcartitems=()=>{
@@ -19,8 +20,15 @@ import axios from  'axios';
        )
     }
 
+    totalCartAmount = ()=>{
+        axios.get('/shoppingcart/totalAmount/'+this.state.cart_id).then(res=>{
+            this.setState({ total_amount: res.data.total_amount })
+        })
+    }
+
     componentDidMount(){
         this.listcartitems();
+        this.totalCartAmount();
     }
 
     render(){
@@ -55,22 +63,24 @@ import axios from  'axios';
                             <a href="cart.html" className="nav-link" data-toggle="dropdown">
                                 <i className="ec ec-shopping-bag"></i>
                                 <span className="cart-items-count count">{this.state.cart_items.length }</span>
-                                <span className="cart-items-total-price total-price"><span className="amount">&#36;1,215.00</span></span>
+                                <span className="cart-items-total-price total-price"><span className="amount">&#36;{this.state.total_amount}</span></span>
                             </a>
                             <ul className="dropdown-menu dropdown-menu-mini-cart">
                                 <li>
                                     <div className="widget_shopping_cart_content">
 
                                         <ul className="cart_list product_list_widget ">
+                                          
+                                        {this.state.cart_items.map(cat=>(
                                             <li className="mini_cart_item">
-                                                <a title="Remove this item" className="remove" href="#">×</a>
+                                                <a  className="remove" href="#remove">×</a>
                                                 <a href="single-product.html">
-                                                    <img className="attachment-shop_thumbnail size-shop_thumbnail wp-post-image" src="assets/images/products/mini-cart1.jpg" alt="" />White lumia 9001&nbsp;
+                                                    <img className="attachment-shop_thumbnail size-shop_thumbnail wp-post-image" src={'product_images/'+cat.image} alt="" />{cat.name}&nbsp;
                                                 </a>
 
-                                                <span className="quantity">2 × <span className="amount">£150.00</span></span>
+                                                <span className="quantity">{cat.quantity} × <span className="amount">{cat.price}</span></span>
                                             </li>
-
+                                        ))}
                                         </ul>
 
 
@@ -78,8 +88,8 @@ import axios from  'axios';
 
 
                                         <p className="buttons">
-                                            <a className="button wc-forward" href="cart.html">View Cart</a>
-                                            <a className="button checkout wc-forward" href="checkout.html">Checkout</a>
+                                            <a className="button wc-forward" href="/cart">View Cart</a>
+                                            <a className="button checkout wc-forward" href="/cart">Checkout</a>
                                         </p>
 
                                     </div>

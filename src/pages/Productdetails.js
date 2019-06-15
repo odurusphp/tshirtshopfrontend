@@ -49,7 +49,6 @@ class Productdetails extends Component {
 
     handlechange(e) {
         this.setState({[e.target.name]: e.target.value});
-        alert(e.target.value)
       }
 
 
