@@ -2,12 +2,15 @@ import React, { Component } from "react";
 import Departments from "./Departments";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
+import { connect } from 'react-redux';
+
 
 export default class Products extends Component {
   constructor() {
     super();
+    
   }
-
+  
   state = {
     products: [],
     departments: [],
