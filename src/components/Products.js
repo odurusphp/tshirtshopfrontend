@@ -2,16 +2,18 @@ import React, { Component } from "react";
 import Departments from "./Departments";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
+import { connect } from 'react-redux';
+import { stat } from "fs";
 
-export default class Products extends Component {
+
+class Products extends Component {
   constructor() {
     super();
-    this.$ = window.$;
+    
   }
+  
   state = {
-    products: [],
     departments: [],
-    pageCount: 0,
     currentPage: 1,
     cart_id: window.localStorage.getItem("cart_id"),
     cart_items: [],
@@ -19,9 +21,8 @@ export default class Products extends Component {
   };
 
   listproducts = () => {
-    //console.log(this.state.currentPage);
-    axios.get(`/products?page=${this.state.currentPage}&limit=${this.state.perPage}`).then(res => {
-      this.setState({ pageCount:res.data.count / this.state.perPage, products: res.data.row });
+    axios.get(`/products?page=${this.state.currentPage}&limit=${this.props.perPage}`).then(res => {
+      this.props.onFetchProducts(res.data);
     });
   };
 
@@ -39,7 +40,6 @@ export default class Products extends Component {
   };
 
   handlePageClick = data => {
-    console.log(data.selected);
     this.setState({ currentPage: data.selected + 1 }, () => {
       this.listproducts();
     });
@@ -73,7 +73,7 @@ export default class Products extends Component {
                     aria-expanded="true"
                   >
                     <ul className="products columns-3">
-                      {this.state.products.map(products => (
+                      {this.props.products.map(products => (
                         <li className="product" key={products.product_id}>
                           <div className="product-outer">
                             <div className="product-inner">
@@ -142,13 +142,13 @@ export default class Products extends Component {
 
             <Departments departmentdata={this.state.departments} />
           </div>
-
+          {this.props.search}
           <ReactPaginate
             previousLabel={"prev."}
             nextLabel={"next"}
             breakLabel={"..."}
             breakClassName={"break-me"}
-            pageCount={this.state.pageCount}
+            pageCount={this.props.count}
             marginPagesDisplayed={2}
             pageRangeDisplayed={5}
             onPageChange={this.handlePageClick}
@@ -161,3 +161,22 @@ export default class Products extends Component {
     );
   }
 }
+
+let mapStateToProps = (state) => {
+  return {
+    products: state.products,
+    count: state.count,
+    perPage: state.perPage
+  }
+}
+
+let mapDispatchToProps = (dispatch)=>{
+  return {
+    onFetchProducts: (data) => {
+      const action = { type: 'ADDPRODUCTS', payload: data };
+      dispatch(action);
+    }
+  }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(Products);
