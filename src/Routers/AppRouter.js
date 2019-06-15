@@ -6,10 +6,8 @@ import Register from '../pages/Register'
 import Login from '../pages/Login'
 import Productdetails from '../pages/Productdetails'
 import {BrowserRouter as Router, Route, Switch, Link} from 'react-router-dom'
-import model from '../model';
-import { createStore, StoreProvider } from 'easy-peasy';
 
-const store = createStore(model);
+
 
 const pageNotFound = ()=>(
   <div>
@@ -19,7 +17,7 @@ const pageNotFound = ()=>(
 
 
 const AppRouter = () => (
-  <StoreProvider store={store}>
+ 
     <Router>
       <div>
         <Header />
@@ -36,7 +34,7 @@ const AppRouter = () => (
         <Footer />
       </div>
     </Router>
-  </StoreProvider>
+ 
 );
 
   export default AppRouter
